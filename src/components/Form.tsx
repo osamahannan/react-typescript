@@ -108,11 +108,8 @@ const Form: React.FC = () => {
   };
 
   const handleReset = () => {
-    console.log("it came here")
     dispatch(resetUserDetails());
-    console.log("it came here 1")
     setActiveStep(0);
-    console.log("it came here 2")
   };
 
   const handlePrev = () => {

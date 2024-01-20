@@ -35,8 +35,6 @@ export interface ResetUserDetailsAction {
 export type UserActionTypes = SetUserDetailsAction | ResetUserDetailsAction;
 
 const userReducer: Reducer<UserState, UserActionTypes> = (state = initialState, action): UserState => {
-
-  console.log("action =", action)
   
   switch (action.type) {
     case 'SET_USER_DETAILS':

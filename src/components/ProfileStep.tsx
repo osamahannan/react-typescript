@@ -17,8 +17,6 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ onNext, onReset, handleChange
 
   const stepOneFormData = useSelector((state: RootState) => state.user.userDetails);
 
-  console.log("stepOneFormData =", stepOneFormData)
-
   const schema = yup.object().shape({
     name: yup.string().required('Name is required'),
     age: yup.number().required("Age is required").positive("Age must be a positive number").integer(),
