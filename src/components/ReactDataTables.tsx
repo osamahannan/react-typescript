@@ -30,7 +30,7 @@ const ReactDataTables: React.FC = () => {
   }, [JSON.stringify(userList)]);
 
   return (
-    <table ref={tableRef}></table>
+    <table ref={tableRef} className='table'></table>
   );
 };
 

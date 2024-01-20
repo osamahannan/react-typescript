@@ -4,53 +4,52 @@ import { TextField, Button, Typography, MenuItem } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FormProfileValues } from './Form';
-import { UserDetails } from '../actions/userActions';
+import { RootState } from '../store/configureStore';
+import { useSelector } from 'react-redux';
 
 interface ProfileStepProps {
-  onNext: any;
+  onNext: (data: FormProfileValues) => void;
+  onReset: () => void;
+  handleChange: (e: React.ChangeEvent) => void;
 }
 
-const ProfileStep: React.FC<ProfileStepProps> = ({ onNext }) => {
+const ProfileStep: React.FC<ProfileStepProps> = ({ onNext, onReset, handleChange }) => {
+
+  const stepOneFormData = useSelector((state: RootState) => state.user.userDetails);
+
+  console.log("stepOneFormData =", stepOneFormData)
 
   const schema = yup.object().shape({
     name: yup.string().required('Name is required'),
-    age: yup.number().required().positive().integer(),
+    age: yup.number().required("Age is required").positive("Age must be a positive number").integer(),
     sex: yup.string().required('Sex is required').oneOf(['Male', 'Female'], 'Invalid sex'),
     mobile: yup.string().required('Mobile is required')?.matches(/^[6-9]\d{9}$/, 'Invalid Indian Mobile Number'),
     idType: yup.string().required('ID Type is required').oneOf(['Aadhar', 'PAN'], 'Invalid ID Type'),
-    // idNumber: yup.string().when('idType', {
-    //   is: (value) => value === 'Aadhar',
-    //   then: yup.string(),
-    //   otherwise: yup.string().when('idType', {
-    //     is: (value) => value === 'PAN',
-    //     then: yup.string(),
-    //     otherwise: yup.string(),
-    //   }),
-    // }),
-    // idNumber: yup.string().when('idType', {
-    //   is: 'Aadhar',
-    //   then: yup.string().matches(/^[2-9]\d{11}$/, 'Invalid Aadhar ID'),
-    //   otherwise: yup.string().when('idType', {
-    //     is: 'PAN',
-    //     then: yup.string().matches(/^[A-Za-z0-9]{10}$/, 'Invalid PAN ID'),
-    //     otherwise: yup.string(),
-    //   }),
-    // }),
+    idNumber: yup.string().required('ID Number is required').test(
+      'id-validation',
+      'Invalid ID Number',
+      (value, { parent }) => {
+        if (parent.idType === 'Aadhar') {
+          return /^[2-9]\d{11}$/.test(value); // Aadhar validation
+        } else if (parent.idType === 'PAN') {
+          return /^[A-Za-z]{5}\d{4}[A-Za-z]$/.test(value); // PAN validation
+        }
+        return false;
+      }
+    ),
   });
 
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<FormProfileValues>({
+  const { register, handleSubmit, formState: { errors } } = useForm<FormProfileValues>({
     resolver: yupResolver(schema),
   });
 
-  const idtype = watch('idType');
-
-  const onSubmit: SubmitHandler<FormProfileValues> = (data : UserDetails) => {
+  const onSubmit: SubmitHandler<FormProfileValues> = (data: FormProfileValues) => {
     onNext(data);
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='form-container'>
-      <Typography variant="h6">Step 1: Personal Information</Typography>
+      <Typography variant="h6">Step 1: Personal Details</Typography>
       <div className='line-container'>
         <TextField
           label="Name"
@@ -59,6 +58,8 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ onNext }) => {
           helperText={errors.name?.message}
           fullWidth
           margin="normal"
+          value={stepOneFormData.name}
+          onChange={handleChange}
         />
         <TextField
           label="Age"
@@ -68,6 +69,8 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ onNext }) => {
           fullWidth
           margin="normal"
           type='number'
+          value={stepOneFormData.age}
+          onChange={handleChange}
         />
       </div>
       <div className="line-container">
@@ -79,6 +82,8 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ onNext }) => {
           helperText={errors.sex?.message}
           fullWidth
           margin="normal"
+          value={stepOneFormData.sex}
+          onChange={handleChange}
         >
           <MenuItem value="Male">Male</MenuItem>
           <MenuItem value="Female">Female</MenuItem>
@@ -90,6 +95,8 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ onNext }) => {
           helperText={errors.mobile?.message}
           fullWidth margin="normal"
           type='number'
+          value={stepOneFormData.mobile}
+          onChange={handleChange}
         />
       </div>
       <div className="line-container">
@@ -101,12 +108,14 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ onNext }) => {
           helperText={errors.idType?.message}
           fullWidth
           margin="normal"
-          style={{width: idtype ? "50%" : "49%"}}
+          style={{ width: stepOneFormData.idType ? "50%" : "49%" }}
+          value={stepOneFormData.idType}
+          onChange={handleChange}
         >
           <MenuItem value="Aadhar">Aadhar</MenuItem>
           <MenuItem value="PAN">PAN</MenuItem>
         </TextField>
-        {idtype === 'Aadhar' && (
+        {stepOneFormData.idType === 'Aadhar' && (
           <TextField
             label="Govt Issued ID Number"
             {...register('idNumber')}
@@ -114,10 +123,12 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ onNext }) => {
             helperText={errors.idNumber?.message}
             fullWidth
             margin="normal"
-            style={{width: "50%"}}
+            style={{ width: "50%" }}
+            value={stepOneFormData.idNumber}
+            onChange={handleChange}
           />
         )}
-        {idtype === 'PAN' && (
+        {stepOneFormData.idType === 'PAN' && (
           <TextField
             label="Govt Issued ID Number"
             {...register('idNumber')}
@@ -125,12 +136,17 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ onNext }) => {
             helperText={errors.idNumber?.message}
             fullWidth
             margin="normal"
-            style={{width: "50%"}}
+            style={{ width: "50%" }}
+            value={stepOneFormData.idNumber}
+            onChange={handleChange}
           />
         )}
       </div>
       <div className='btn'>
-        <Button type="submit" variant="contained" color="primary" fullWidth>
+        <Button type="button" variant="outlined" fullWidth className='button outlined' onClick={onReset}>
+          Reset
+        </Button>
+        <Button type="submit" variant="contained" fullWidth className='button'>
           Next
         </Button>
       </div>

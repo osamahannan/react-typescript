@@ -5,10 +5,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FormAddressValues } from './Form';
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
-import { AppDispatch, RootState } from '../store/configureStore';
-import { addUserList } from '../actions/userActions';
-import { UserData } from '../reducers/userListReducer';
 
 interface AddressStepProps {
   onPrev: () => void;
@@ -26,9 +22,6 @@ const schema = yup.object().shape({
 const AddressStep: React.FC<AddressStepProps> = ({ onPrev, onSubmit }) => {
 
   const [countryOptions, setCountryOptions] = useState<string[]>([]);
-  const stepOneFormData = useSelector((state: RootState) => state?.user?.userDetails);
-
-  const dispatch: AppDispatch = useDispatch();
 
   useEffect(() => {
     const fetchCountryOptions = async () => {
@@ -53,43 +46,45 @@ const AddressStep: React.FC<AddressStepProps> = ({ onPrev, onSubmit }) => {
   };
 
   const onSubmitStep2: SubmitHandler<FormAddressValues> = (data) => {
-    const userData: UserData = { ...stepOneFormData, ...data };
-    dispatch(addUserList(userData));
     onSubmit(data);
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmitStep2)} className='form-container'>
-      <Typography variant="h6">Step 2: Address Information</Typography>
+      <Typography variant="h6">Step 2: Address Detail</Typography>
       <TextField label="Address" {...register('address')} fullWidth margin="normal" />
-      <TextField label="State" {...register('state')} fullWidth margin="normal" />
-      <TextField label="City" {...register('city')} fullWidth margin="normal" />
-      <TextField
-        label="Country"
-        select
-        {...register('country')}
-        fullWidth
-        margin="normal"
-      >
-        {countryOptions.map((country) => (
-          <MenuItem key={country} value={country}>
-            {country}
-          </MenuItem>
-        ))}
-      </TextField>
-      <TextField
-        label="Pincode"
-        {...register('pincode')}
-        fullWidth
-        margin="normal"
-        error={!!errors.pincode}
-        helperText={errors.pincode?.message}
-      />
-      <div className='addess-button'>
-        <Button type="button" variant="outlined" onClick={handlePrev} style={{ marginRight: '10px' }}>
+      <div className="line-container">
+        <TextField label="State" {...register('state')} fullWidth margin="normal" />
+        <TextField label="City" {...register('city')} fullWidth margin="normal" />
+      </div>
+      <div className="line-container">
+        <TextField
+          label="Country"
+          select
+          {...register('country')}
+          fullWidth
+          margin="normal"
+        >
+          {countryOptions.map((country) => (
+            <MenuItem key={country} value={country}>
+              {country}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          label="Pincode"
+          {...register('pincode')}
+          fullWidth
+          margin="normal"
+          error={!!errors.pincode}
+          helperText={errors.pincode?.message}
+        />
+      </div>
+      <div className='btn'>
+        <Button type="button" variant="outlined" fullWidth onClick={handlePrev} className='button outlined'>
           Back
         </Button>
-        <Button type="submit" variant="contained" color="primary">
+        <Button type="submit" variant="contained" fullWidth color="primary" className='button'>
           Submit
         </Button>
       </div>

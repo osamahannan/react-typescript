@@ -1,12 +1,82 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { resetUserDetails, setUserDetails } from '../actions/userActions';
+import { useDispatch, useSelector } from 'react-redux';
+import { addUserList, resetUserDetails, setUserDetails } from '../actions/userActions';
 import { Typography, Stepper, Step, StepLabel } from '@mui/material';
 import ProfileStep from './ProfileStep';
 import AddressStep from './AddressStep';
-import { AppDispatch } from '../store/configureStore';
+import { AppDispatch, RootState } from '../store/configureStore';
 import ReactDataTables from "./ReactDataTables";
 import "datatables.net-dt/css/jquery.dataTables.css";
+import { UserData } from '../reducers/userListReducer';
+import { toast } from 'react-toastify';
+import { createTheme, Theme } from '@mui/material/styles';
+import { outlinedInputClasses } from '@mui/material/OutlinedInput';
+
+export const customTheme = (outerTheme: Theme) =>
+  createTheme({
+    palette: {
+      mode: outerTheme.palette.mode,
+    },
+    components: {
+      MuiTextField: {
+        styleOverrides: {
+          root: {
+            '--TextField-brandBorderColor': '#cdcfd1',
+            '--TextField-brandBorderHoverColor': '#1C1C1C',
+            '--TextField-brandBorderFocusedColor': '#1C1C1C',
+            '& label.Mui-focused': {
+              color: 'var(--TextField-brandBorderFocusedColor)',
+            },
+          },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          notchedOutline: {
+            borderColor: 'var(--TextField-brandBorderColor)',
+          },
+          root: {
+            [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
+              borderColor: 'var(--TextField-brandBorderHoverColor)',
+            },
+            [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
+              borderColor: 'var(--TextField-brandBorderFocusedColor)',
+            },
+          },
+        },
+      },
+      MuiFilledInput: {
+        styleOverrides: {
+          root: {
+            '&::before, &::after': {
+              borderBottom: '2px solid var(--TextField-brandBorderColor)',
+            },
+            '&:hover:not(.Mui-disabled, .Mui-error):before': {
+              borderBottom: '2px solid var(--TextField-brandBorderHoverColor)',
+            },
+            '&.Mui-focused:after': {
+              borderBottom: '2px solid var(--TextField-brandBorderFocusedColor)',
+            },
+          },
+        },
+      },
+      MuiInput: {
+        styleOverrides: {
+          root: {
+            '&::before': {
+              borderBottom: '2px solid var(--TextField-brandBorderColor)',
+            },
+            '&:hover:not(.Mui-disabled, .Mui-error):before': {
+              borderBottom: '2px solid var(--TextField-brandBorderHoverColor)',
+            },
+            '&.Mui-focused:after': {
+              borderBottom: '2px solid var(--TextField-brandBorderFocusedColor)',
+            },
+          },
+        },
+      },
+    },
+  });
 
 export interface FormProfileValues {
   name: string;
@@ -14,7 +84,7 @@ export interface FormProfileValues {
   sex: string;
   mobile: string;
   idType: string;
-  idNumber?: string;
+  idNumber: string;
 }
 
 export interface FormAddressValues {
@@ -28,6 +98,8 @@ export interface FormAddressValues {
 const Form: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
 
+  const stepOneFormData = useSelector((state: RootState) => state?.user?.userDetails);
+
   const [activeStep, setActiveStep] = useState<number>(0);
 
   const handleNext = (data: FormProfileValues) => {
@@ -35,21 +107,44 @@ const Form: React.FC = () => {
     setActiveStep((prevStep) => prevStep + 1);
   };
 
+  const handleReset = () => {
+    console.log("it came here")
+    dispatch(resetUserDetails());
+    console.log("it came here 1")
+    setActiveStep(0);
+    console.log("it came here 2")
+  };
+
   const handlePrev = () => {
     setActiveStep((prevStep) => prevStep - 1);
   };
 
   const handleSubmit = (data: FormAddressValues) => {
+    const userData: UserData = { ...stepOneFormData, ...data };
+    dispatch(addUserList(userData));
     dispatch(resetUserDetails());
     setActiveStep(0);
+    toast.success("User added successfully", {
+      position: "top-right",
+      autoClose: 2000
+    })
   };
+
+  const change = (e: React.ChangeEvent) => {
+    const value = (e.target as HTMLInputElement).value
+    const name = (e.target as HTMLInputElement).name
+    const data = {
+      [name]: value
+    }
+    dispatch(setUserDetails(data));
+  }
 
   const steps = ['Step 1', 'Step 2'];
 
   const getStepContent = (step: number) => {
     switch (step) {
       case 0:
-        return <ProfileStep onNext={handleNext} />;
+        return <ProfileStep onNext={handleNext}  onReset={handleReset} handleChange={change}/>;
       case 1:
         return <AddressStep onPrev={handlePrev} onSubmit={handleSubmit} />;
       default:
