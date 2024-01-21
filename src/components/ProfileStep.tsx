@@ -109,6 +109,7 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ onNext, onReset, handleChange
           style={{ width: stepOneFormData.idType ? "50%" : "49%" }}
           value={stepOneFormData.idType}
           onChange={handleChange}
+          className='idType'
         >
           <MenuItem value="Aadhar">Aadhar</MenuItem>
           <MenuItem value="PAN">PAN</MenuItem>
@@ -124,6 +125,7 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ onNext, onReset, handleChange
             style={{ width: "50%" }}
             value={stepOneFormData.idNumber}
             onChange={handleChange}
+            className='idNumber'
           />
         )}
         {stepOneFormData.idType === 'PAN' && (
@@ -137,6 +139,7 @@ const ProfileStep: React.FC<ProfileStepProps> = ({ onNext, onReset, handleChange
             style={{ width: "50%" }}
             value={stepOneFormData.idNumber}
             onChange={handleChange}
+            className='idNumber'
           />
         )}
       </div>

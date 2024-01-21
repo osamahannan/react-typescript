@@ -99,6 +99,7 @@ const Form: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
 
   const stepOneFormData = useSelector((state: RootState) => state?.user?.userDetails);
+  // const userList = useSelector((state: RootState) => state?.userList?.users);
 
   const [activeStep, setActiveStep] = useState<number>(0);
 
@@ -117,14 +118,23 @@ const Form: React.FC = () => {
   };
 
   const handleSubmit = (data: FormAddressValues) => {
-    const userData: UserData = { ...stepOneFormData, ...data };
-    dispatch(addUserList(userData));
-    dispatch(resetUserDetails());
-    setActiveStep(0);
-    toast.success("User added successfully", {
-      position: "top-right",
-      autoClose: 2000
-    })
+    try {
+      const userData: UserData = { ...stepOneFormData, ...data };
+      // const updatedUserList = [...userList, userData]
+      dispatch(addUserList(userData));
+      dispatch(resetUserDetails());
+      setActiveStep(0);
+      toast.success("User added successfully", {
+        position: "top-right",
+        autoClose: 2000
+      })
+    } catch (e) {
+      toast.error("Oops, something went wrong!", {
+        position: "top-right",
+        autoClose: 2000
+      })
+      console.log("error -----> ", e)
+    }
   };
 
   const change = (e: React.ChangeEvent) => {
@@ -141,7 +151,7 @@ const Form: React.FC = () => {
   const getStepContent = (step: number) => {
     switch (step) {
       case 0:
-        return <ProfileStep onNext={handleNext}  onReset={handleReset} handleChange={change}/>;
+        return <ProfileStep onNext={handleNext} onReset={handleReset} handleChange={change} />;
       case 1:
         return <AddressStep onPrev={handlePrev} onSubmit={handleSubmit} />;
       default:

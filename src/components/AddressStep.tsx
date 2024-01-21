@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { TextField, Button, Typography, MenuItem } from '@mui/material';
+import { TextField, Button, Typography, MenuItem, Paper, MenuList, ClickAwayListener } from '@mui/material';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FormAddressValues } from './Form';
@@ -22,6 +22,8 @@ const schema = yup.object().shape({
 const AddressStep: React.FC<AddressStepProps> = ({ onPrev, onSubmit }) => {
 
   const [countryOptions, setCountryOptions] = useState<string[]>([]);
+  const [filteredCountries, setFilteredCountries] = useState<string[]>([]);
+  const [country, setCountry] = useState<string>("");
 
   useEffect(() => {
     const fetchCountryOptions = async () => {
@@ -49,28 +51,58 @@ const AddressStep: React.FC<AddressStepProps> = ({ onPrev, onSubmit }) => {
     onSubmit(data);
   };
 
+  const handleCountry = (event: React.ChangeEvent) => {
+    const value = (event.target as HTMLInputElement).value
+    setCountry(value)
+    const filterCountries = countryOptions?.filter(country => country.toLowerCase().includes(value.toLowerCase()))
+    setFilteredCountries(filterCountries)
+  }
+
+  const handleClickAway = () => {
+    setFilteredCountries([])
+  }
+
+  const selectCountryHandler = (country: string) => {
+    setCountry(country)
+    setFilteredCountries([])
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmitStep2)} className='form-container'>
       <Typography variant="h6">Step 2: Address Detail</Typography>
       <TextField label="Address" {...register('address')} fullWidth margin="normal" />
       <div className="line-container">
-        <TextField label="State" {...register('state')} fullWidth margin="normal" />
         <TextField label="City" {...register('city')} fullWidth margin="normal" />
+        <TextField label="State" {...register('state')} fullWidth margin="normal" />
       </div>
       <div className="line-container">
-        <TextField
-          label="Country"
-          select
-          {...register('country')}
-          fullWidth
-          margin="normal"
-        >
-          {countryOptions.map((country) => (
-            <MenuItem key={country} value={country}>
-              {country}
-            </MenuItem>
-          ))}
-        </TextField>
+        <div className="country-select">
+          <TextField
+            label="Country"
+            {...register('country')}
+            fullWidth
+            margin="normal"
+            onChange={handleCountry}
+            autoComplete='off'
+            value={country}
+          />
+          {filteredCountries && filteredCountries.length > 0 && Array.isArray(filteredCountries) && (
+            <ClickAwayListener
+              onClickAway={handleClickAway}
+              mouseEvent="onMouseDown"
+            >
+              <Paper className='country-paper'>
+                <MenuList className='menu-list'>
+                  {filteredCountries.map((country, idx) => {
+                    return (
+                      <MenuItem key={idx} onClick={() => selectCountryHandler(country)}>{country}</MenuItem>
+                    );
+                  })}
+                </MenuList>
+              </Paper>
+            </ClickAwayListener>
+          )}
+        </div>
         <TextField
           label="Pincode"
           {...register('pincode')}
