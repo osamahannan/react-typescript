@@ -1,18 +1,71 @@
-# Getting Started with Create React App
+# React Redux User Registration Form
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A two-step user registration form built with React, Redux, Material-UI, TypeScript, and React Hook Form.
 
-## Available Scripts
+## Table of Contents
 
-In the project directory, you can run:
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
 
-### `npm start`
+## Features
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Two-step user registration form.
+- Material-UI components for a visually appealing design.
+- Form validation using Yup.
+- State management with Redux.
+- TypeScript for static typing.
+- React Hook Form for form management.
+- User data storage in Redux.
+- Display of submitted users in a DataTables.net.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Installation
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/osamahannan/react-typescript.git
+```
+
+2. Clone the repository:
+
+```bash
+cd your-project
+```
+
+3. Clone the repository:
+```bash
+npm install
+```
+
+## Usage
+
+```bash
+npm start
+```
+
+1. Open your browser and go to http://localhost:3000.
+2. Follow the steps in the user registration form.
+
+## Project Structure
+
+- src/
+    - `actions/`: Redux action creators.
+    - `components/`: React components.
+    - `reducers/`: Redux reducers.
+    - `store/`: Redux store configuration.
+    - `App.tsx`: Main application component.
+    - `index.tsx`: Entry point of the application.
+    -  ...
+
+## Contributing
+If you'd like to contribute to this project, please follow the guidelines in [CONTRIBUTING.md](#CONTRIBUTING.md)
+
+## License
+This project is licensed under the MIT License - see the [LICENSE.md](#LICENSE.md) file for details.
 
 ### `npm test`
 
