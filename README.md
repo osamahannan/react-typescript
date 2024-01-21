@@ -1,6 +1,8 @@
 # React Redux User Registration Form
 
 A two-step user registration form built with React, Redux, Material-UI, TypeScript, and React Hook Form.
+![image](https://github.com/osamahannan/react-typescript/assets/83069516/a4832d73-c0b0-41bf-ac98-21301230cc0c)
+
 
 ## Table of Contents
 
